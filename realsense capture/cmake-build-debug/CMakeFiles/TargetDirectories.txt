@@ -1,0 +1,3 @@
+/Users/manster/Desktop/graduate/realsense optim/realsense capture/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/manster/Desktop/graduate/realsense optim/realsense capture/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/manster/Desktop/graduate/realsense optim/realsense capture/cmake-build-debug/CMakeFiles/RealSense_Capture.dir
