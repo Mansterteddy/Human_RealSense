@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "librealsense/rs.hpp"
+#include "rs.hpp"
 #include "opencv2/opencv.hpp"
 #include "opencv2/highgui.hpp"
 
@@ -13,7 +13,6 @@ int const FRAMERATE = 30;
 
 char* const WINDOW_DEPTH = "Depth Image";
 char* const WINDOW_RGB = "RGB Image";
-
 
 rs::context _rs_ctx;
 rs::device& _rs_camera = *_rs_ctx.get_device(0);
@@ -37,21 +36,12 @@ bool initialize_streaming()
     return success;
 }
 
-
 static void onMouse(int event, int x, int y, int, void* window_name)
 {
     if(event == cv::EVENT_LBUTTONDOWN)
     {
         _loop = false;
     }
-    /*if(event == cv::EVENT_RBUTTONDOWN)
-    {
-        _capture = true;
-    }
-    if(event == cv::EVENT_RBUTTONDBLCLK)
-    {
-        _capture = false;
-    }*/
 }
 
 void setup_windows()
@@ -87,7 +77,7 @@ bool display_next_frame()
         cv::Mat save_image;
         cv::resize(mid_image, save_image, cv::Size(256, 256));
 
-        string depth_file = "/Users/manster/Desktop/realsense optim/realsense capture/img/" + str + "_distance.png";
+        string depth_file = "/Users/manster/Desktop/Human_RealSense/Human_RealSense_Capture/distance_img/" + str + "_distance.png";
         cv::imwrite(depth_file, save_image);
     }
 
@@ -109,10 +99,9 @@ bool display_next_frame()
         cv::Mat save_image;
         cv::resize(mid_image, save_image, cv::Size(256, 256));
 
-        string depth_file = "/Users/manster/Desktop/realsense optim/realsense capture/img/" + str + "_d.jpg";
+        string depth_file = "/Users/manster/Desktop/Human_RealSense/Human_RealSense_Capture/d_img/" + str + "_d.jpg";
         cv::imwrite(depth_file, save_image);
     }
-    //cvWaitKey(1);
 
     cv::cvtColor(rgb, rgb, cv::COLOR_BGR2RGB);
     cv::rectangle(rgb, point_a, point_b, cv::Scalar(255, 255, 0));
@@ -130,10 +119,9 @@ bool display_next_frame()
         cv::Mat save_image;
         cv::resize(mid_image, save_image, cv::Size(256, 256));
 
-        string color_file = "/Users/manster/Desktop/realsense optim/realsense capture/img/" + str + "_c.jpg";
+        string color_file = "/Users/manster/Desktop/Human_RealSense/Human_RealSense_Capture/c_img/" + str + "_c.jpg";
         cv::imwrite(color_file, save_image);
     }
-    //cvWaitKey(1);
 
     cur_frame += 1;
 
@@ -191,14 +179,15 @@ int main() try
 
         display_next_frame();
 
-        float  depth = getDistance(320, 240);
+        //float  depth = getDistance(320, 240);
     }
 
     _rs_camera.stop();
     cv::destroyAllWindows();
 
     return EXIT_SUCCESS;
-}catch (const rs::error & e)
+
+} catch (const rs::error & e)
 {
     std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n   " << e.what() << endl;
     return EXIT_FAILURE;
