@@ -14,7 +14,7 @@ def calcGradient():
 # Remove Outliers in captured depth
 def removeOutliers(humanbody_x, humanbody_y, captured_depth_mat):
 
-    depth_range = 1000
+    depth_range = 900
 
     captured_depth_nozeros = []
 
@@ -193,15 +193,27 @@ def generate_Depth(dist_x, dist_y, predicted_depth_mat, captured_depth_mat):
 
 if __name__ == "__main__":
 
-    predicted_depth_filename = "./img/2840/depth.mat"
-    captured_depth_filename = "./img/2840/distance.png"
+    cur_dir = "./img/2796/"
+
+    predicted_depth_filename = cur_dir + "depth.mat"
+    captured_depth_filename = cur_dir + "distance.png"
 
     predicted_depth_mat = scipy.io.loadmat(predicted_depth_filename)
     predicted_depth_mat = predicted_depth_mat['x'][0]
+
+    for i in range(len(predicted_depth_mat)):
+        for j in range(len(predicted_depth_mat)):
+            if predicted_depth_mat[i][j] == 1:
+                predicted_depth_mat[i][j] = 1
+            else:
+                predicted_depth_mat[i][j] = 22 - predicted_depth_mat[i][j]
+
     print("predicted_depth_mat: ", predicted_depth_mat)
 
     captured_depth_mat = cv2.imread(captured_depth_filename, -1)
-    captured_depth_mat = ndimage.median_filter(captured_depth_mat, 3)
+    for i in range(3):
+        captured_depth_mat = ndimage.median_filter(captured_depth_mat, 10)
+
     print("captured_depth_mat: ", captured_depth_mat)
 
     dist_x, dist_y = calcDistance(predicted_depth_mat, captured_depth_mat)
@@ -217,20 +229,22 @@ if __name__ == "__main__":
             cur_y = key[1]
             captured_depth_mat[cur_x][cur_y] = dist_dict[i][key]
 
-    refined_depth_mat = guidedfilter(predicted_depth_mat, captured_depth_mat, 3, 1e-3)
-
+    refined_depth_mat = captured_depth_mat
+    #refined_depth_mat = guidedfilter(predicted_depth_mat, captured_depth_mat, 40, 0.1)
+    '''
     for key in dist_dict[0].keys():
         cur_x = key[0]
         cur_y = key[1]
         refined_depth_mat[cur_x][cur_y] = dist_dict[0][key]
-
-    '''
-    for i in range(len(dist_dict)):
-        for key in dist_dict[i].keys():
-            cur_x = key[0]
-            cur_y = key[1]
-            captured_depth_mat[cur_x][cur_y] = dist_dict[i][key] * 10 / 255.0
     '''
 
-    final_depth_mat = np.array(refined_depth_mat, dtype="uint8")
-    cv2.imwrite("res.jpg", final_depth_mat)
+    final_img = refined_depth_mat
+
+    for i in range(len(final_img)):
+        for j in range(len(final_img[0])):
+            if final_img[i][j] < 0:
+                final_img[i][j] = 0
+            else:
+                final_img[i][j] = final_img[i][j] * 20 / 256.0
+
+    cv2.imwrite("res.jpg", final_img)
